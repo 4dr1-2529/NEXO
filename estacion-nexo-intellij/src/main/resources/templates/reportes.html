@@ -37,7 +37,7 @@
         <h2>Ventas por combustible</h2>
         <p class="panel-vacio" th:if="${resumen.combustiblesVendidos.isEmpty()}">Sin volumen vendido en el periodo.</p>
         <div th:unless="${resumen.combustiblesVendidos.isEmpty()}"
-             th:replace="~{paneles :: barras(${resumen.combustiblesVendidos})}"></div>
+             th:replace="~{paneles :: barrasPorUnidad(${resumen.combustiblesPorUnidad()})}"></div>
         <div class="tabla" th:unless="${resumen.combustiblesVendidos.isEmpty()}">
             <table>
                 <thead><tr><th>Código</th><th>Producto</th><th>Unidad</th><th>Cantidad</th></tr></thead>
@@ -53,10 +53,13 @@
 
     <section th:if="${resumen.ventas}" aria-label="Productos más vendidos">
         <h2>Productos más vendidos</h2>
-        <ol class="ranking-productos" th:unless="${resumen.combustiblesVendidos.isEmpty()}">
-            <li th:each="fila,stat : ${resumen.combustiblesVendidos}"
-                th:text="|${stat.count}. ${fila.dato.nombre} · ${#numbers.formatDecimal(fila.dato.cantidad,1,3)} ${fila.dato.unidad}|"></li>
-        </ol>
+        <th:block th:unless="${resumen.combustiblesVendidos.isEmpty()}" th:each="grupo : ${resumen.combustiblesPorUnidad()}">
+            <h3 class="titulo-unidad" th:text="|Ranking (${grupo.key})|"></h3>
+            <ol class="ranking-productos">
+                <li th:each="fila,stat : ${grupo.value}"
+                    th:text="|${stat.count}. ${fila.dato.nombre} · ${#numbers.formatDecimal(fila.dato.cantidad,1,3)} ${fila.dato.unidad}|"></li>
+            </ol>
+        </th:block>
         <p class="panel-vacio" th:if="${resumen.combustiblesVendidos.isEmpty()}">Sin ventas en el periodo.</p>
     </section>
 

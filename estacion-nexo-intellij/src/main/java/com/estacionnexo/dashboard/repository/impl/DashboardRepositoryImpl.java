@@ -35,6 +35,7 @@ public class DashboardRepositoryImpl implements DashboardRepository {
 
     @Override
     public List<CombustiblePanel> litrosVendidos(LocalDate desde, LocalDate hasta, Long vendedor) {
+        // Histórico: incluye productos/categorías archivados; no filtra por SKU canónico.
         return jdbc.query("""
             SELECT p.codigo_producto,p.nombre,SUM(d.cantidad_litros) cantidad,NULL minimo,p.unidad_medida unidad
             FROM detalle_venta d JOIN venta v ON v.id_venta=d.id_venta
@@ -42,9 +43,7 @@ public class DashboardRepositoryImpl implements DashboardRepository {
             JOIN categoria c ON c.id_categoria=p.id_categoria
             WHERE v.fecha_hora >= ? AND v.fecha_hora < ? AND v.estado='Confirmada'
               AND (? IS NULL OR v.id_usuario=?)
-              AND c.estado='Activo' AND p.estado='Activo'
               AND c.nombre IN ('Gasolinas','Diésel','Gases vehiculares')
-              AND p.codigo_producto IN ('GAS-REG','GAS-PRE','DIE-B5S50','GLP-AUTO','GNV-C')
             GROUP BY p.id_producto,p.codigo_producto,p.nombre,p.unidad_medida
             ORDER BY cantidad DESC,p.nombre,p.id_producto
             """, COMBUSTIBLE, desde.atStartOfDay(), hasta.plusDays(1).atStartOfDay(), vendedor, vendedor);

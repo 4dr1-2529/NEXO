@@ -40,19 +40,19 @@ public class ConsultaRepositoryImpl implements ConsultaRepository {
     public List<Detalle> detalles(Tipo tipo, long id) {
         String sql = switch (tipo) {
             case COMPRAS -> """
-                SELECT p.nombre, d.cantidad_litros, d.precio_compra precio, d.subtotal
+                SELECT p.nombre, d.cantidad_litros, d.precio_compra precio, d.subtotal, p.unidad_medida unidad
                 FROM detalle_compra d JOIN producto p ON p.id_producto=d.id_producto
                 WHERE d.id_compra=? ORDER BY d.id_detalle_compra
                 """;
             case VENTAS -> """
-                SELECT p.nombre, d.cantidad_litros, d.precio_unitario precio, d.subtotal
+                SELECT p.nombre, d.cantidad_litros, d.precio_unitario precio, d.subtotal, p.unidad_medida unidad
                 FROM detalle_venta d JOIN producto p ON p.id_producto=d.id_producto
                 WHERE d.id_venta=? ORDER BY d.id_detalle_venta
                 """;
             default -> throw new IllegalArgumentException("La consulta no admite líneas de combustible.");
         };
         return jdbc.query(sql, (rs, i) -> new Detalle(rs.getString("nombre"), rs.getBigDecimal("cantidad_litros"),
-            rs.getBigDecimal("precio"), rs.getBigDecimal("subtotal")), id);
+            rs.getBigDecimal("precio"), rs.getBigDecimal("subtotal"), rs.getString("unidad")), id);
     }
 
     private String consulta(Tipo tipo) {

@@ -23,7 +23,7 @@ mvn clean install
 mvn -pl estacion-nexo-intellij spring-boot:run
 ```
 
-3. Abrir **http://localhost:8080/login**
+3. Abrir la dirección oficial **http://localhost:8080/login** (puerto 8080; `/` redirige a `/login`).
 
 Cuentas de demostración: `admin`, `operador`, `vendedor` / `nexo2026`.
 

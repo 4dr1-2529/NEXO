@@ -14,9 +14,11 @@
     </dl>
     <div class="tabla" th:unless="${resultado.lineas.isEmpty()}">
         <table>
-            <thead><tr><th>Combustible</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th></tr></thead>
+            <thead><tr><th>Combustible</th><th>Cantidad</th><th>Unidad</th><th>Precio unitario</th><th>Subtotal</th></tr></thead>
             <tbody><tr th:each="linea : ${resultado.lineas}">
-                <td th:text="${linea.producto}"></td><td th:text="${linea.litros}"></td>
+                <td th:text="${linea.producto}"></td>
+                <td th:text="${#numbers.formatDecimal(linea.litros,1,3)}"></td>
+                <td th:text="${linea.unidad}"></td>
                 <td th:text="${linea.precio}"></td><td th:text="${linea.subtotal}"></td>
             </tr></tbody>
         </table>

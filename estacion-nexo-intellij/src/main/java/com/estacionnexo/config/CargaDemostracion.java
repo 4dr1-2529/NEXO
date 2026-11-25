@@ -259,18 +259,24 @@ public class CargaDemostracion {
         var entradas = new ArrayList<LineaSolicitud>();
         var salidas = new ArrayList<LineaSolicitud>();
         for (int i = 0; i < catalogo.size(); i++) {
-            entradas.add(new LineaSolicitud(catalogo.get(i), BigDecimal.valueOf(90L + i * 8 + indice * 3),
+            // Varianza determinista (sin Random): solo afecta cargas nuevas / jornadas faltantes.
+            long ondaCompra = Math.round(7 * Math.sin((indice + 1) * 0.85 + i * 0.55));
+            long ondaVenta = Math.round(5 * Math.cos((indice + 2) * 1.05 + i * 0.4));
+            entradas.add(new LineaSolicitud(catalogo.get(i),
+                BigDecimal.valueOf(Math.max(40L, 90L + i * 8 + indice * 3 + ondaCompra)),
                 new BigDecimal("3.50").add(BigDecimal.valueOf(i, 1))));
-            salidas.add(new LineaSolicitud(catalogo.get(i), BigDecimal.valueOf(42L + i * 5 + indice * 2), null));
+            salidas.add(new LineaSolicitud(catalogo.get(i),
+                BigDecimal.valueOf(Math.max(15L, 42L + i * 5 + indice * 2 + ondaVenta)), null));
         }
-        reloj.en(dia.atTime(7, 30), () -> CUENTAS.forEach(u -> marcarSiFalta(u, Marca.ENTRADA)));
-        reloj.en(dia.atTime(8, 0), () -> abrirCajaSiFalta(admin));
-        reloj.en(dia.atTime(9, 15), () -> operaciones.comprar(admin,
+        int desfase = indice % 5;
+        reloj.en(dia.atTime(7, 25 + desfase), () -> CUENTAS.forEach(u -> marcarSiFalta(u, Marca.ENTRADA)));
+        reloj.en(dia.atTime(8, desfase), () -> abrirCajaSiFalta(admin));
+        reloj.en(dia.atTime(9, 10 + desfase), () -> operaciones.comprar(admin,
             new OperacionSolicitud(token(dia, "compra"), proveedor, MARCA, entradas)));
-        reloj.en(dia.atTime(15, 45), () -> operaciones.vender(vendedor,
+        reloj.en(dia.atTime(15, 40 + desfase), () -> operaciones.vender(vendedor,
             new OperacionSolicitud(token(dia, "venta"), null, null, salidas)));
-        reloj.en(dia.atTime(18, 0), () -> cerrarCajaSiAbierta(admin));
-        reloj.en(dia.atTime(18, 15), () -> CUENTAS.forEach(u -> marcarSiFalta(u, Marca.SALIDA)));
+        reloj.en(dia.atTime(18, desfase), () -> cerrarCajaSiAbierta(admin));
+        reloj.en(dia.atTime(18, 10 + desfase), () -> CUENTAS.forEach(u -> marcarSiFalta(u, Marca.SALIDA)));
     }
 
     private void marcarSiFalta(String usuario, Marca marca) {

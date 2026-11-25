@@ -50,7 +50,7 @@
                     <div class="composicion-anillo" th:style="|--mezcla:${mezcla.gradiente}|"
                          aria-hidden="true">
                         <div><small th:text="|Total (${mezcla.unidadGrafico})|"></small>
-                            <strong th:text="|${#numbers.formatDecimal(resumen.totalLitros,1,1)} ${mezcla.unidadGrafico}|"></strong></div>
+                            <strong th:text="|${#numbers.formatDecimal(mezcla.totalGrafico,1,1)} ${mezcla.unidadGrafico}|"></strong></div>
                     </div>
                     <ul class="composicion-leyenda" aria-label="Volumen y participación por combustible">
                         <li th:each="parte : ${mezcla.segmentos}">
@@ -61,8 +61,8 @@
                     </ul>
                 </div>
                 <details class="panel-detalle" th:unless="${mezcla.segmentos.isEmpty()}">
-                    <summary>Ver barras por combustible</summary>
-                    <div th:replace="~{paneles :: barras(${resumen.combustiblesVendidos})}"></div>
+                    <summary>Ver barras por combustible (por unidad)</summary>
+                    <div th:replace="~{paneles :: barrasPorUnidad(${resumen.combustiblesPorUnidad()})}"></div>
                 </details>
             </section>
             <section class="panel-grafico">
@@ -95,7 +95,7 @@
             <div><dt>Combustibles agotados</dt><dd th:text="${resumen.inventario.agotados()}"></dd></div>
         </dl>
         <p th:if="${resumen.inventario.productos.isEmpty()}">No hay combustibles activos.</p>
-        <div th:replace="~{paneles :: barras(${resumen.inventario.productos})}"></div>
+        <div th:replace="~{paneles :: barrasPorUnidad(${resumen.inventario.productosPorUnidad()})}"></div>
         <details class="panel-detalle">
             <summary>Detalle exacto de stock actual</summary>
             <div th:replace="~{paneles :: stock(${resumen.inventario.productos})}"></div>

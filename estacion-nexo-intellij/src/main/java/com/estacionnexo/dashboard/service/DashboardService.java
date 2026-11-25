@@ -10,7 +10,11 @@ import com.estacionnexo.dashboard.model.ProveedorCompra;
 import com.estacionnexo.shared.Periodo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public interface DashboardService {
     Resumen cargar(Cuenta cuenta, LocalDate desde, LocalDate hasta);
@@ -29,6 +33,26 @@ public interface DashboardService {
 
         public Composicion composicion() {
             return Composicion.de(combustiblesVendidos.stream().map(Barra::dato).toList());
+        }
+
+        /** Ranking y barras agrupados por unidad, sin cruzar L/gal/m3. */
+        public Map<String, List<Barra>> combustiblesPorUnidad() {
+            return combustiblesVendidos.stream()
+                .sorted(Comparator
+                    .comparing((Barra b) -> ordenUnidad(b.dato().unidad()))
+                    .thenComparing(b -> b.dato().cantidad(), Comparator.reverseOrder()))
+                .collect(Collectors.groupingBy(
+                    b -> b.dato().unidad() == null ? "L" : b.dato().unidad(),
+                    LinkedHashMap::new, Collectors.toList()));
+        }
+
+        private static int ordenUnidad(String unidad) {
+            return switch (unidad == null ? "L" : unidad) {
+                case "L" -> 0;
+                case "gal" -> 1;
+                case "m3" -> 2;
+                default -> 3;
+            };
         }
 
         public List<Actividad> actividadDiaria() {
@@ -59,6 +83,21 @@ public interface DashboardService {
 
         public long agotados() {
             return productos.stream().filter(p -> p.dato().cantidad().signum() == 0).count();
+        }
+
+        public Map<String, List<Barra>> productosPorUnidad() {
+            return productos.stream()
+                .sorted(Comparator
+                    .comparing((Barra b) -> switch (b.dato().unidad() == null ? "L" : b.dato().unidad()) {
+                        case "L" -> 0;
+                        case "gal" -> 1;
+                        case "m3" -> 2;
+                        default -> 3;
+                    })
+                    .thenComparing(b -> b.dato().cantidad(), Comparator.reverseOrder()))
+                .collect(Collectors.groupingBy(
+                    b -> b.dato().unidad() == null ? "L" : b.dato().unidad(),
+                    LinkedHashMap::new, Collectors.toList()));
         }
     }
 

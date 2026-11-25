@@ -32,6 +32,7 @@ class ComposicionTest {
             new CombustiblePanel("GLP-AUTO", "GLP", new BigDecimal("50"), null, "gal")));
         assertEquals(1, resultado.segmentos().size());
         assertEquals("L", resultado.unidadGrafico());
+        assertEquals(new BigDecimal("100"), resultado.totalGrafico());
         assertEquals("Regular", resultado.segmentos().getFirst().nombre());
     }
 

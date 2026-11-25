@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
-public record Composicion(String gradiente, List<Segmento> segmentos, String unidadGrafico) {
+public record Composicion(String gradiente, List<Segmento> segmentos, String unidadGrafico, BigDecimal totalGrafico) {
     private static final List<String> PALETA = List.of("#b7ed81", "#83c8ef", "#efbd82", "#c9ade8", "#efa8ab", "#a7b8b0");
 
     public static Composicion de(List<CombustiblePanel> combustibles) {
@@ -16,7 +16,7 @@ public record Composicion(String gradiente, List<Segmento> segmentos, String uni
             base = combustibles;
         }
         if (base.isEmpty()) {
-            return new Composicion("", List.of(), "L");
+            return new Composicion("", List.of(), "L", BigDecimal.ZERO);
         }
         String unidad = base.getFirst().unidad() == null ? "L" : base.getFirst().unidad();
         var visibles = new ArrayList<>(base.subList(0, Math.min(5, base.size())));
@@ -27,7 +27,7 @@ public record Composicion(String gradiente, List<Segmento> segmentos, String uni
         }
         var total = visibles.stream().map(CombustiblePanel::cantidad).reduce(BigDecimal.ZERO, BigDecimal::add);
         if (total.signum() == 0) {
-            return new Composicion("", List.of(), unidad);
+            return new Composicion("", List.of(), unidad, BigDecimal.ZERO);
         }
         var gradual = new StringJoiner(", ", "conic-gradient(", ")");
         var segmentos = new ArrayList<Segmento>();
@@ -43,7 +43,7 @@ public record Composicion(String gradiente, List<Segmento> segmentos, String uni
             inicio = fin;
         }
         String fondo = segmentos.size() == 1 ? segmentos.getFirst().color() : gradual.toString();
-        return new Composicion(fondo, List.copyOf(segmentos), unidad);
+        return new Composicion(fondo, List.copyOf(segmentos), unidad, total);
     }
 
     private static BigDecimal porcentaje(BigDecimal cantidad, BigDecimal total) {

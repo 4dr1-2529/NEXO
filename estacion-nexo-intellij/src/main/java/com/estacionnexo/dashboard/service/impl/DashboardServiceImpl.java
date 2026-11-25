@@ -14,7 +14,9 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,10 +75,21 @@ public class DashboardServiceImpl implements DashboardService {
         return new Inventario(soloLitros, barras(productos), mixtas);
     }
 
+    /** Porcentaje relativo solo dentro de la misma unidad (L, gal, m3). */
     private List<Barra> barras(List<CombustiblePanel> combustibles) {
-        var mayor = combustibles.stream().map(CombustiblePanel::cantidad).reduce(BigDecimal.ONE, BigDecimal::max);
-        return combustibles.stream().map(p -> new Barra(p, p.cantidad().multiply(BigDecimal.valueOf(100))
-            .divide(mayor, 0, RoundingMode.HALF_UP).intValueExact())).toList();
+        Map<String, BigDecimal> maximoPorUnidad = combustibles.stream().collect(Collectors.toMap(
+            p -> p.unidad() == null ? "L" : p.unidad(),
+            CombustiblePanel::cantidad,
+            BigDecimal::max));
+        return combustibles.stream().map(p -> {
+            String unidad = p.unidad() == null ? "L" : p.unidad();
+            BigDecimal mayor = maximoPorUnidad.getOrDefault(unidad, BigDecimal.ONE);
+            if (mayor.signum() == 0) {
+                mayor = BigDecimal.ONE;
+            }
+            return new Barra(p, p.cantidad().multiply(BigDecimal.valueOf(100))
+                .divide(mayor, 0, RoundingMode.HALF_UP).intValueExact());
+        }).toList();
     }
 
     private BigDecimal sumar(List<Dia> dias, Function<Dia, BigDecimal> campo) {

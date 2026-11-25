@@ -240,6 +240,7 @@ button { color: inherit; background: #233831; border: 1px solid #577266; }
 .grafico-leyenda li::before { content: ""; width: 1rem; height: .85rem; border-radius: .12rem; }
 .grafico-leyenda .ingreso::before { background: #94d4aa; }
 .grafico-leyenda .egreso::before { background: repeating-linear-gradient(135deg,#e6b57f 0 3px,#624527 3px 4px); }
+.titulo-unidad { margin: 1rem 0 .4rem; font-size: 1rem; font-weight: 600; color: #3d4a3f; }
 .barras-combustible { max-width: 58rem; list-style: none; padding: 0; display: grid; gap: .9rem; }
 .barra-cabecera { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .8rem; padding-bottom: .25rem; }
 .barra-cabecera strong { margin-inline-start: auto; }

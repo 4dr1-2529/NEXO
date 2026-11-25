@@ -57,6 +57,21 @@
         <div class="barra-pista" aria-hidden="true"><div class="barra-litros" th:style="|--avance:${fila.avance}%|"></div></div>
     </li>
 </ul>
+<div th:fragment="barrasPorUnidad(grupos)">
+    <th:block th:each="grupo : ${grupos}">
+        <h3 class="titulo-unidad" th:text="|Unidad: ${grupo.key}|"></h3>
+        <ul class="barras-combustible">
+            <li th:each="fila : ${grupo.value}">
+                <div class="barra-cabecera">
+                    <span th:text="${fila.dato.nombre}"></span>
+                    <span class="stock-bajo" th:if="${fila.dato.bajo()}">Stock bajo</span>
+                    <strong th:text="|${#numbers.formatDecimal(fila.dato.cantidad,1,3)} ${fila.dato.unidad}|"></strong>
+                </div>
+                <div class="barra-pista" aria-hidden="true"><div class="barra-litros" th:style="|--avance:${fila.avance}%|"></div></div>
+            </li>
+        </ul>
+    </th:block>
+</div>
 <div th:fragment="stock(filas)" class="tabla">
     <table>
         <thead><tr><th>Código</th><th>Combustible</th><th>Unidad</th><th>Stock actual</th><th>Mínimo</th><th>Alerta</th></tr></thead>
