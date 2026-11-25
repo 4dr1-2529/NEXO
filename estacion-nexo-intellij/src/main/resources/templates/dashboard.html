@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Dashboard')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen paneles">
+    <h1>Resumen de operaciones</h1>
+    <p class="resumen-rol" th:text="${resumen.finanzas ? 'Administración de la estación' : (resumen.ventas ? 'Mis ventas confirmadas' : 'Control operativo de inventario')}"></p>
+    <div class="atajos-rol">
+        <a class="boton" th:if="${resumen.ventas}" th:href="@{/ventas/nueva}">Nueva venta</a>
+        <a class="boton secundaria" th:if="${resumen.finanzas}" th:href="@{/compras/nueva}">Nueva compra</a>
+        <a class="boton" th:unless="${resumen.ventas}" th:href="@{/inventario/entrada}">Registrar entrada</a>
+        <a class="boton secundaria" th:unless="${resumen.ventas}" th:href="@{/inventario/salida}">Registrar salida</a>
+    </div>
+    <p class="error" role="alert" th:if="${error}" th:text="${error}"></p>
+    <th:block th:if="${resumen.ventas}">
+        <div th:replace="~{paneles :: filtro('/dashboard',${resumen.periodo})}"></div>
+    </th:block>
+    <section th:if="${resumen.ventas}" aria-label="Ventas del periodo">
+        <dl class="indicadores">
+            <div><dt>Total vendido</dt><dd th:text="|S/ ${#numbers.formatDecimal(resumen.totalVentas,1,2)}|"></dd></div>
+            <div><dt>Litros vendidos (solo L)</dt><dd th:text="|${#numbers.formatDecimal(resumen.totalLitros,1,3)} L|"></dd></div>
+            <div><dt>Ventas confirmadas</dt><dd th:text="${resumen.cantidadVentas}"></dd></div>
+        </dl>
+        <p class="panel-vacio" th:if="${resumen.cantidadVentas == 0}">No hay ventas confirmadas en el periodo.</p>
+        <section class="panel-grafico">
+            <h2>Ventas diarias</h2>
+            <div th:if="${resumen.lineaVentas != null}"
+                 th:replace="~{paneles :: grafico('Ventas diarias',${resumen.lineaVentas},false)}"></div>
+            <p class="panel-vacio" th:if="${resumen.lineaVentas == null}">Sin datos gráficos para este periodo.</p>
+            <details class="panel-detalle">
+                <summary>Detalle de ventas por fecha</summary>
+                <div class="tabla">
+                    <table>
+                        <thead><tr><th>Fecha</th><th>Ventas</th><th>Importe (S/)</th><th>Litros (L)</th></tr></thead>
+                        <tbody><tr th:each="dia : ${resumen.dias}">
+                            <th scope="row" th:text="${dia.fecha}"></th><td th:text="${dia.cantidadVentas}"></td>
+                            <td th:text="${#numbers.formatDecimal(dia.ventas,1,2)}"></td>
+                            <td th:text="${#numbers.formatDecimal(dia.litros,1,3)}"></td>
+                        </tr></tbody>
+                    </table>
+                </div>
+            </details>
+        </section>
+        <div class="paneles-perfil">
+            <section class="panel-grafico" th:with="mezcla=${resumen.composicion()}">
+                <h2>Distribución de volumen (unidad homogénea)</h2>
+                <p class="panel-vacio" th:if="${mezcla.segmentos.isEmpty()}">Sin volumen vendido comparable en el periodo.</p>
+                <div class="composicion" th:unless="${mezcla.segmentos.isEmpty()}">
+                    <div class="composicion-anillo" th:style="|--mezcla:${mezcla.gradiente}|"
+                         aria-hidden="true">
+                        <div><small th:text="|Total (${mezcla.unidadGrafico})|"></small>
+                            <strong th:text="|${#numbers.formatDecimal(resumen.totalLitros,1,1)} ${mezcla.unidadGrafico}|"></strong></div>
+                    </div>
+                    <ul class="composicion-leyenda" aria-label="Volumen y participación por combustible">
+                        <li th:each="parte : ${mezcla.segmentos}">
+                            <span class="composicion-color" th:style="|--segmento:${parte.color}|" aria-hidden="true"></span>
+                            <span th:text="${parte.nombre}"></span>
+                            <strong th:text="|${#numbers.formatDecimal(parte.litros,1,3)} ${parte.unidad} · ${#numbers.formatDecimal(parte.participacion,1,1)} %|"></strong>
+                        </li>
+                    </ul>
+                </div>
+                <details class="panel-detalle" th:unless="${mezcla.segmentos.isEmpty()}">
+                    <summary>Ver barras por combustible</summary>
+                    <div th:replace="~{paneles :: barras(${resumen.combustiblesVendidos})}"></div>
+                </details>
+            </section>
+            <section class="panel-grafico">
+                <h2>Actividad de ventas por día</h2>
+                <p class="panel-vacio" th:if="${resumen.cantidadVentas == 0}">No hubo ventas en estas fechas.</p>
+                <ul class="actividad-dias" aria-label="Cantidad de ventas confirmadas por fecha">
+                    <li th:each="dia : ${resumen.actividadDiaria()}" th:class="|actividad-nivel-${dia.nivel}|">
+                        <time th:datetime="${dia.fecha}" th:text="${dia.etiqueta()}"></time>
+                        <strong th:text="|${dia.ventas} ${dia.ventas == 1 ? 'venta' : 'ventas'}|"></strong>
+                    </li>
+                </ul>
+            </section>
+        </div>
+        <div th:replace="~{analisis-ventas :: graficos(${resumen.analisisVentas()})}"></div>
+        <section th:if="${resumen.comparacion != null}" class="panel-grafico" aria-label="Comparación de periodos">
+            <h2>Comparación con el periodo anterior</h2>
+            <p th:text="|Anterior: ${resumen.comparacion.anterior.desde} — ${resumen.comparacion.anterior.hasta}|"></p>
+            <dl class="indicadores">
+                <div><dt>Ventas periodo actual</dt><dd th:text="|S/ ${#numbers.formatDecimal(resumen.totalVentas,1,2)}|"></dd></div>
+                <div><dt>Ventas periodo anterior</dt><dd th:text="|S/ ${#numbers.formatDecimal(resumen.comparacion.ventasAnterior,1,2)}|"></dd></div>
+                <div><dt>Ticket / cantidad anterior</dt><dd th:text="${resumen.comparacion.ventasCantidadAnterior}"></dd></div>
+            </dl>
+        </section>
+    </section>
+    <section th:unless="${resumen.ventas}" class="panel-grafico" aria-label="Inventario actual">
+        <h2>Inventario</h2>
+                <dl class="indicadores">
+            <div><dt>Stock en litros (solo L)</dt><dd th:text="|${#numbers.formatDecimal(resumen.inventario.litros,1,3)} L|"></dd></div>
+            <div><dt>Bajo el mínimo</dt><dd th:text="${resumen.inventario.bajoMinimo()}"></dd></div>
+            <div><dt>Combustibles agotados</dt><dd th:text="${resumen.inventario.agotados()}"></dd></div>
+        </dl>
+        <p th:if="${resumen.inventario.productos.isEmpty()}">No hay combustibles activos.</p>
+        <div th:replace="~{paneles :: barras(${resumen.inventario.productos})}"></div>
+        <details class="panel-detalle">
+            <summary>Detalle exacto de stock actual</summary>
+            <div th:replace="~{paneles :: stock(${resumen.inventario.productos})}"></div>
+        </details>
+    </section>
+    <section th:if="${resumen.ventas}" class="panel-enlaces" aria-label="Consultas operativas">
+        <article>
+            <h2>Stock actual</h2>
+            <p th:text="|${#numbers.formatDecimal(resumen.inventario.litros,1,3)} L (sin mezclar gal/m3)|"></p>
+            <a class="boton secundaria" th:href="@{/inventario/existencias}">Consultar existencias</a>
+        </article>
+        <article th:if="${resumen.finanzas}">
+            <h2>Caja diaria</h2>
+            <p th:if="${resumen.saldoActual != null}" th:text="|Saldo actual S/ ${#numbers.formatDecimal(resumen.saldoActual,1,2)}|"></p>
+            <a class="boton secundaria" th:href="@{/finanzas(desde=${resumen.periodo.desde},hasta=${resumen.periodo.hasta})}">Ver flujos y cierres</a>
+        </article>
+        <article th:if="${resumen.finanzas}">
+            <h2>Reportes</h2>
+            <p>Consolidados con filtros e impresión.</p>
+            <a class="boton secundaria" th:href="@{/reportes(desde=${resumen.periodo.desde},hasta=${resumen.periodo.hasta})}">Abrir reportes</a>
+        </article>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,25 @@
+# Opcional. Copia este archivo como nexo-local.properties si XAMPP usa otra configuración.
+nexo.db.port=3306
+nexo.db.schema=estacion_nexo_demostracion
+spring.datasource.username=root
+spring.datasource.password=
+# Para permitir o desactivar la creación automática del esquema:
+# nexo.db.create=true
+# Datos públicos de la estación.
+# nexo.contacto.direccion=
+# nexo.contacto.telefono=
+# nexo.contacto.correo=
+# Primer administrador para instalaciones con el perfil local.
+# nexo.admin.username=
+# nexo.admin.password=
+# nexo.admin.dni=
+# nexo.admin.nombres=
+# nexo.admin.apellidos=
+# nexo.admin.telefono=
+# Opcional: crear SKUs canónicos faltantes (GLP-AUTO, GNV-C, etc.) sin sobrescribir precios existentes.
+# Solo defina precios reales de su estación. Sin estas claves no se insertan productos automáticamente.
+# nexo.catalogo.precio.GAS-REG=
+# nexo.catalogo.precio.GAS-PRE=
+# nexo.catalogo.precio.DIE-B5S50=
+# nexo.catalogo.precio.GLP-AUTO=
+# nexo.catalogo.precio.GNV-C=

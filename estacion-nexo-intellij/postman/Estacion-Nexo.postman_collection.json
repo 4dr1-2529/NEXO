@@ -1,0 +1,393 @@
+{
+  "info": {
+    "name": "Estación Nexo · API v1",
+    "description": "Usa el almacén de cookies de Postman. En Preparar sesión, copia el campo oculto _csrf de la respuesta de login a csrfLogin y envía el formulario. Después del ingreso, copia token de la respuesta Token de sesión a csrf. Configura los identificadores de registros en tu base aislada. Inicia otra sesión con cada rol al probar permisos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "username",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "password",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "csrfLogin",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "csrf",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "categoria",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "producto",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "proveedor",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "solicitud",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Preparar sesión",
+      "item": [
+        {
+          "name": "Obtener formulario de ingreso",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/login"
+          }
+        },
+        {
+          "name": "Enviar credenciales locales",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/login",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "{{username}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "text"
+                },
+                {
+                  "key": "_csrf",
+                  "value": "{{csrfLogin}}",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Token de sesión",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/sesion/csrf"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Catálogos",
+      "item": [
+        {
+          "name": "Categorías",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/categorias?pagina=0"
+          }
+        },
+        {
+          "name": "Combustibles por categoría",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/combustibles?categoria={{categoria}}"
+          }
+        },
+        {
+          "name": "Proveedores · solo administrador",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/proveedores"
+          }
+        },
+        {
+          "name": "Crear categoría · 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/categorias",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Categoría de prueba\",\n  \"descripcion\": \"Catálogo local\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Editar categoría · 204",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/categorias/{{categoria}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Categoría actualizada\",\n  \"descripcion\": \"Catálogo local\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Desactivar categoría · 204",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/categorias/{{categoria}}/estado?activo=false"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Operaciones",
+      "item": [
+        {
+          "name": "Abrir caja",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/caja/apertura",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"saldo\": 1000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Compra",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/compras",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"solicitud\": \"{{solicitud}}\",\n  \"proveedor\": 1,\n  \"lineas\": [\n    {\n      \"producto\": 1,\n      \"litros\": 150,\n      \"precio\": 5.4\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Venta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/ventas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"solicitud\": \"{{solicitud}}\",\n  \"lineas\": [\n    {\n      \"producto\": 1,\n      \"litros\": 20\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cerrar caja",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/caja/cierre"
+          }
+        },
+        {
+          "name": "Asistencia propia",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/asistencia/propia"
+          }
+        },
+        {
+          "name": "Marcar entrada",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/asistencia/propia",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"marca\": \"ENTRADA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Casos rechazados",
+      "item": [
+        {
+          "name": "Apertura negativa · 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/caja/apertura",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"saldo\": -1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Proveedor con cuenta de vendedor · 403",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/proveedores"
+          }
+        },
+        {
+          "name": "Compra sin líneas · 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/compras",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"solicitud\": \"{{solicitud}}\",\n  \"proveedor\": 1,\n  \"lineas\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

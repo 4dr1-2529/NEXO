@@ -1,0 +1,45 @@
+# Compilación
+/target/
+**/target/
+/out/
+**/out/
+
+# IntelliJ IDEA (conservar .idea/.run compartidos; excluir personal)
+.idea/workspace.xml
+.idea/shelf/
+.idea/httpRequests/
+.idea/markdown.xml
+.idea/dataSources/
+.idea/dataSources.local.xml
+.idea/dataSources.xml
+*.iws
+*.iml
+
+# Configuración local y secretos
+**/config/nexo-local.properties
+*.local.properties
+.env
+.env.*
+
+# Respaldos y dumps (fuera del repo)
+*.sql.gz
+**/dump*.sql
+**/NEXO-BACKUPS*/
+**/GASOLINERIA-BACKUP*/
+**/restore_*.sql
+effective-pom.xml
+
+# Logs y temporales
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*~
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini

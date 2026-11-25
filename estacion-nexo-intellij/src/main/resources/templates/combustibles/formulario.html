@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Combustibles')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen">
+    <h1 th:text="${id == null ? 'Nuevo combustible' : 'Editar registro'}"></h1>
+    <p class="error" role="alert" th:if="${error}" th:text="${error}"></p>
+    <form method="post" th:action="${id == null} ? @{/combustibles} : @{/combustibles/{id}/editar(id=${id})}" th:object="${datos}">
+        <input type="hidden" name="_envio" th:value="${envio}">
+        <label for="codigo">Código</label>
+        <input type="text" th:field="*{codigo}" maxlength="10" pattern="[A-Za-z0-9]+(?:\x2D[A-Za-z0-9]+)*" placeholder="GAS-REG" title="Hasta 10 letras, números o guiones entre segmentos" required>
+        <p class="error" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></p>
+        <label for="categoria">Categoría</label>
+        <select th:field="*{categoria}" required>
+            <option value="">Selecciona una categoría</option>
+            <option th:each="opcion : ${opcionesCategoria}" th:value="${opcion.id}" th:text="${opcion.datos.nombre}"></option>
+        </select>
+        <p class="error" th:if="${#fields.hasErrors('categoria')}" th:errors="*{categoria}"></p>
+        <label for="nombre">Nombre</label>
+        <input type="text" th:field="*{nombre}" required>
+        <p class="error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></p>
+        <label for="unidadMedida">Unidad de medida</label>
+        <select th:field="*{unidadMedida}" required>
+            <option value="L">L (litros)</option>
+            <option value="gal">gal (galones)</option>
+            <option value="m3">m3 (metros cúbicos)</option>
+        </select>
+        <p class="error" th:if="${#fields.hasErrors('unidadMedida')}" th:errors="*{unidadMedida}"></p>
+        <label for="precio">Precio por unidad</label>
+        <input type="number" th:field="*{precio}" required step="0.01" min="0.01">
+        <p class="error" th:if="${#fields.hasErrors('precio')}" th:errors="*{precio}"></p>
+        <label for="stockMinimo">Stock mínimo (misma unidad, opcional)</label>
+        <input type="number" th:field="*{stockMinimo}" min="0" step="0.001" max="999999999.999">
+        <p class="error" th:if="${#fields.hasErrors('stockMinimo')}" th:errors="*{stockMinimo}"></p>
+        <button class="boton" type="submit">Guardar</button>
+        <a class="boton secundaria" th:href="@{/combustibles}">Volver</a>
+    </form>
+</main>
+</body>
+</html>

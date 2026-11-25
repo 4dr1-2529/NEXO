@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Estación NEXO" type="Application" factoryName="Application" nameIsGenerated="false">
+    <option name="MAIN_CLASS_NAME" value="com.estacionnexo.NexoApplication" />
+    <module name="estacion-nexo" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/estacion-nexo-intellij" />
+    <shortenClasspath name="NONE" />
+    <envs>
+      <env name="SPRING_PROFILES_ACTIVE" value="demostracion" />
+    </envs>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

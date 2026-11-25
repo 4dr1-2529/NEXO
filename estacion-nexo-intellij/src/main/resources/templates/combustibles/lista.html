@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Combustibles')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen catalogo">
+    <h1>Combustibles</h1>
+    <p role="status" th:if="${mensaje}" th:text="${mensaje}"></p>
+    <p class="error" role="alert" th:if="${error}" th:text="${error}"></p>
+    <a class="boton" th:if="${admin}" th:href="@{/combustibles/nuevo}">Nuevo combustible</a>
+    <a class="boton secundaria enlace-archivados" th:if="${admin}" th:href="@{/combustibles(archivados=${!archivados},categoria=${categoria})}" th:text="${archivados ? 'Ver activos' : 'Incluir archivados'}"></a>
+    <p th:if="${registros.isEmpty()}">No se encontraron registros.</p>
+    <div class="tabla tabla-catalogo" th:unless="${registros.isEmpty()}">
+        <table>
+            <thead><tr><th>Código</th><th>Categoría</th><th>Nombre</th><th>Unidad</th><th>Precio unitario</th><th>Existencias</th><th>Estado</th><th th:if="${admin}">Acciones</th></tr></thead>
+            <tbody><tr th:each="registro : ${registros}">
+                <td th:text="${registro.datos.codigo}"></td>
+                <td th:text="${nombresCategoria[registro.datos.categoria]}"></td>
+                <td th:text="${registro.datos.nombre}"></td>
+                <td th:text="${registro.datos.unidadMedida}"></td>
+                <td th:text="|S/ ${#numbers.formatDecimal(registro.datos.precio,1,2)} / ${registro.datos.unidadMedida}|"></td>
+                <td th:text="|${#numbers.formatDecimal(registro.existencias,1,3)} ${registro.datos.unidadMedida}|"></td>
+                <td th:text="${registro.activo ? 'Activo' : 'Inactivo'}"></td>
+                <td class="catalogo-acciones" th:if="${admin}">
+                    <a th:href="@{/combustibles/{id}/editar(id=${registro.id})}">Editar</a>
+                    <form method="post" th:action="@{/combustibles/{id}/estado(id=${registro.id})}">
+        <input type="hidden" name="_envio" th:value="${envio}">
+                        <button th:unless="${registro.activo}" class="boton secundaria" type="submit" name="activo" value="true">Activar</button>
+                        <details th:if="${registro.activo}" class="confirmacion">
+                            <summary class="boton secundaria">Desactivar…</summary>
+                            <p>¿Confirmas que deseas desactivar este registro? Puedes cerrar este aviso para cancelar.</p>
+                            <button class="boton peligro" type="submit" name="activo" value="false">Confirmar desactivación</button>
+                        </details>
+                    </form>
+                </td>
+                
+            </tr></tbody>
+        </table>
+    </div>
+    <nav aria-label="Paginación">
+        <a th:if="${pagina > 0}" th:href="@{/combustibles(pagina=${pagina - 1},categoria=${categoria},archivados=${archivados})}">Anterior</a>
+        <a th:if="${registros.size() == 25}" th:href="@{/combustibles(pagina=${pagina + 1},categoria=${categoria},archivados=${archivados})}">Siguiente</a>
+    </nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Existencias')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen">
+    <h1>Existencias</h1>
+    <section class="panel-grafico">
+        <h2>Existencias por combustible</h2>
+        <dl class="indicadores">
+            <div><dt>Total en litros (solo L)</dt><dd th:text="|${#numbers.formatDecimal(inventario.litros,1,3)} L|"></dd></div>
+        </dl>
+        <p th:if="${inventario.unidadesMixtas}">El total en litros no incluye gal ni m3. Revise el detalle por unidad.</p>
+        <div th:replace="~{paneles :: barras(${inventario.productos})}"></div>
+    </section>
+    <p th:if="${productos.isEmpty()}">No hay combustibles disponibles.</p>
+    <div class="tabla" th:unless="${productos.isEmpty()}">
+        <table>
+            <thead><tr><th>ID</th><th>Código</th><th>Combustible</th><th>Unidad</th><th>Stock actual</th><th>Mínimo</th><th>Alerta</th></tr></thead>
+            <tbody><tr th:each="p : ${productos}">
+                <td th:text="${p.id}"></td><td th:text="${p.datos.codigo}"></td>
+                <td th:text="${p.datos.nombre}"></td>
+                <td th:text="${p.datos.unidadMedida}"></td>
+                <td th:text="|${#numbers.formatDecimal(p.existencias,1,3)} ${p.datos.unidadMedida}|"></td>
+                <td th:text="${p.datos.stockMinimo == null ? 'Sin mínimo' : #numbers.formatDecimal(p.datos.stockMinimo,1,3) + ' ' + p.datos.unidadMedida}"></td>
+                <td th:text="${p.datos.stockMinimo != null && p.existencias < p.datos.stockMinimo ? 'Stock bajo' : '—'}"></td>
+            </tr></tbody>
+        </table>
+    </div>
+    <nav aria-label="Paginación">
+        <a th:if="${pagina > 0}" th:href="@{/inventario/existencias(pagina=${pagina - 1})}">Anterior</a>
+        <a th:if="${productos.size() == 25}" th:href="@{/inventario/existencias(pagina=${pagina + 1})}">Siguiente</a>
+    </nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<header class="nexo-menu" th:fragment="menu">
+    <div class="nexo-cabecera">
+        <a class="marca" th:href="@{/dashboard}">ESTACIÓN <strong>NEXO</strong></a>
+        <span th:text="${nombre ?: navegacion?.usuario}"></span>
+        <form method="post" th:action="@{/logout}"><button class="boton secundaria" type="submit">Cerrar sesión</button></form>
+    </div>
+    <details class="nexo-modulos" open>
+        <summary>Módulos</summary>
+        <nav aria-label="Módulos" class="nexo-grupos">
+            <section th:each="grupo : ${navegacion?.grupos}">
+                <h2 th:text="${grupo.nombre}"></h2>
+                <a th:each="enlace : ${grupo.enlaces}" th:if="${!enlace.destino.isEmpty()}"
+                   th:href="@{${enlace.destino}}" th:aria-current="${enlace.activo ? 'page' : null}"
+                   th:text="${enlace.nombre}"></a>
+            </section>
+        </nav>
+    </details>
+</header>
+</body>
+</html>

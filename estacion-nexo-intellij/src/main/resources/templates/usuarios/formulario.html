@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Usuarios')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen">
+    <h1 th:text="${id == null ? 'Registrar usuario' : 'Editar usuario'}"></h1>
+    <p class="error" role="alert" th:if="${error}" th:text="${error}"></p>
+    <form method="post" th:action="${id == null} ? @{/usuarios} : @{/usuarios/{id}/editar(id=${id})}" th:object="${datos}">
+        <input type="hidden" name="_envio" th:value="${envio}">
+        <label for="empleado">ID del empleado</label>
+        <input type="number" th:field="*{empleado}" min="1" th:readonly="${id != null}" required>
+        <p class="error" th:if="${#fields.hasErrors('empleado')}" th:errors="*{empleado}"></p>
+        <label for="rol">Rol</label>
+        <select th:field="*{rol}" required>
+            <option value="0">Selecciona un rol</option>
+            <option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.nombre}"></option>
+        </select>
+        <p class="error" th:if="${#fields.hasErrors('rol')}" th:errors="*{rol}"></p>
+        <label for="username">Usuario</label>
+        <input type="text" th:field="*{username}" required>
+        <p class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
+        <label for="password">Contraseña</label>
+        <input type="password" th:field="*{password}" autocomplete="new-password" th:required="${id == null}">
+        <p class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+        <button class="boton" type="submit">Guardar</button>
+        <a class="boton secundaria" th:href="@{/usuarios}">Volver</a>
+    </form>
+</main>
+</body>
+</html>

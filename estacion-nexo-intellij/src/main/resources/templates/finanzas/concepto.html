@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Concepto económico')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen">
+    <h1 th:text="${id == null ? 'Nuevo concepto' : 'Editar concepto'}"></h1>
+    <p class="error" role="alert" th:if="${error}" th:text="${error}"></p>
+    <form method="post" th:action="${id == null} ? @{/finanzas/conceptos} : @{/finanzas/conceptos/{id}/editar(id=${id})}" th:object="${datos}">
+        <input type="hidden" name="_envio" th:value="${envio}">
+        <label for="codigo">Código</label>
+        <input th:field="*{codigo}" maxlength="10" th:readonly="${id != null}" required>
+        <p class="error" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></p>
+        <label for="nombre">Nombre</label>
+        <input th:field="*{nombre}" maxlength="60" required>
+        <p class="error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></p>
+        <label for="tipo">Tipo</label>
+        <input th:if="${id != null}" th:field="*{tipo}" readonly>
+        <select th:if="${id == null}" th:field="*{tipo}" required>
+            <option th:each="t : ${tipos}" th:value="${t}" th:text="${t}"></option>
+        </select>
+        <p class="error" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}"></p>
+        <button class="boton" type="submit">Guardar</button>
+        <a class="boton secundaria" th:href="@{/finanzas/conceptos}">Volver</a>
+    </form>
+</main>
+</body>
+</html>

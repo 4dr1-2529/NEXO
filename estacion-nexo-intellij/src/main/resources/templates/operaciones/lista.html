@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera(${titulo})}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen">
+    <h1 th:text="${titulo}"></h1>
+    <p role="status" th:if="${mensaje}" th:text="${mensaje}"></p>
+    <nav>
+        <a th:if="${ruta == '/compras'}" th:href="@{/compras/nueva}">Registrar compra</a>
+        <a th:if="${ruta == '/ventas'}" th:href="@{/ventas/registrar}">Registrar venta</a>
+        <a th:if="${ruta == '/inventario/movimientos'}" th:href="@{/inventario/entrada}">Registrar entrada</a>
+        <a th:if="${ruta == '/inventario/movimientos'}" th:href="@{/inventario/salida}">Registrar salida</a>
+    </nav>
+    <form method="get" th:action="@{${ruta}}">
+        <label for="desde">Desde</label>
+        <input type="date" id="desde" name="desde" th:value="${desde}">
+        <label for="hasta">Hasta</label>
+        <input type="date" id="hasta" name="hasta" th:value="${hasta}">
+        <input th:if="${tipo != null}" type="hidden" name="tipo" th:value="${tipo}">
+        <button class="boton" type="submit">Aplicar filtros</button>
+    </form>
+    <p th:if="${registros.isEmpty()}">No se encontraron movimientos.</p>
+    <div class="tabla" th:unless="${registros.isEmpty()}">
+        <table>
+            <thead><tr><th>Código</th><th>Fecha</th><th>Responsable</th><th>Referencia</th><th>Estado o tipo</th><th>Importe o litros</th><th th:if="${detalle}">Detalle</th></tr></thead>
+            <tbody><tr th:each="r : ${registros}">
+                <td th:text="${r.codigo}"></td><td th:text="${r.fecha}"></td>
+                <td th:text="${r.responsable}"></td><td th:text="${r.referencia ?: '—'}"></td>
+                <td th:text="${r.estado}"></td><td th:text="${r.valor}"></td>
+                <td th:if="${detalle}"><a th:href="@{${ruta + '/' + r.id}}">Ver</a></td>
+            </tr></tbody>
+        </table>
+    </div>
+    <nav aria-label="Paginación">
+        <a th:if="${pagina > 0}" th:href="@{${ruta}(pagina=${pagina - 1},desde=${desde},hasta=${hasta},tipo=${tipo})}">Anterior</a>
+        <a th:if="${registros.size() == 25}" th:href="@{${ruta}(pagina=${pagina + 1},desde=${desde},hasta=${hasta},tipo=${tipo})}">Siguiente</a>
+    </nav>
+</main>
+</body>
+</html>

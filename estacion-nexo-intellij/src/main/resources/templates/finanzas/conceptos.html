@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Conceptos económicos')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen">
+    <h1>Conceptos económicos</h1>
+    <a class="boton" th:href="@{/finanzas/conceptos/nuevo}">Nuevo concepto</a>
+    <p role="status" th:if="${mensaje}" th:text="${mensaje}"></p>
+    <p th:if="${registros.isEmpty()}">No hay conceptos registrados.</p>
+    <div class="tabla" th:unless="${registros.isEmpty()}">
+        <table>
+            <thead><tr><th>Código</th><th>Nombre</th><th>Tipo</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody><tr th:each="r : ${registros}">
+                <td th:text="${r.datos.codigo}"></td><td th:text="${r.datos.nombre}"></td>
+                <td th:text="${r.datos.tipo}"></td><td th:text="${r.activo ? 'Activo' : 'Inactivo'}"></td>
+                <td>
+                    <a th:href="@{/finanzas/conceptos/{id}/editar(id=${r.id})}">Editar</a>
+                    <form method="post" th:action="@{/finanzas/conceptos/{id}/estado(id=${r.id})}">
+        <input type="hidden" name="_envio" th:value="${envio}">
+                        <button th:unless="${r.activo}" class="boton secundaria" type="submit" name="activo" value="true">Activar</button>
+                        <details th:if="${r.activo}" class="confirmacion">
+                            <summary class="boton secundaria">Desactivar…</summary>
+                            <p>¿Confirmas que deseas desactivar este registro? Puedes cerrar este aviso para cancelar.</p>
+                            <button class="boton peligro" type="submit" name="activo" value="false">Confirmar desactivación</button>
+                        </details>
+                    </form>
+                </td>
+            </tr></tbody>
+        </table>
+    </div>
+    <nav aria-label="Paginación">
+        <a th:if="${pagina > 0}" th:href="@{/finanzas/conceptos(pagina=${pagina - 1})}">Anterior</a>
+        <a th:if="${registros.size() == 25}" th:href="@{/finanzas/conceptos(pagina=${pagina + 1})}">Siguiente</a>
+    </nav>
+</main>
+</body>
+</html>

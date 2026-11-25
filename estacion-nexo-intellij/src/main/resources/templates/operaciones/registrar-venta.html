@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Registrar venta')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen">
+    <h1>Registrar venta</h1>
+    <a class="boton" th:href="@{/ventas/nueva}">Nueva venta</a>
+    <a th:href="@{/ventas}">Historial de ventas</a>
+    <a th:href="@{/inventario/existencias}">Consultar existencias</a>
+</main>
+</body>
+</html>

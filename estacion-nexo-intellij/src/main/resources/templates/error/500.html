@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Error de la aplicación')}"></head>
+<body>
+<header th:replace="~{publico/base :: barra}"></header>
+<main class="panel">
+    <h1>No se pudo completar la solicitud</h1>
+    <p>Vuelve al resumen para continuar. Si estabas guardando un cambio, consulta primero el listado para comprobar su estado.</p>
+    <a class="boton secundaria" th:href="@{/dashboard}">Volver al resumen</a>
+</main>
+</body>
+</html>

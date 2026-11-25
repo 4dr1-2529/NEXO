@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Inicio')}"></head>
+<body>
+<header th:replace="~{publico/base :: barra}"></header>
+<main class="portada">
+    <h1>Estación Nexo</h1>
+    <p>Estación de servicio y abastecimiento de combustibles.</p>
+    <a class="boton" th:href="@{/contacto}">Ver contacto</a>
+</main>
+</body>
+</html>

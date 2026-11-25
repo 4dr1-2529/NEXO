@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Categorías')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen">
+    <h1 th:text="${id == null ? 'Nueva categoría' : 'Editar registro'}"></h1>
+    <p class="error" role="alert" th:if="${error}" th:text="${error}"></p>
+    <form method="post" th:action="${id == null} ? @{/categorias} : @{/categorias/{id}/editar(id=${id})}" th:object="${datos}">
+        <input type="hidden" name="_envio" th:value="${envio}">
+        <label for="nombre">Nombre</label>
+        <input type="text" th:field="*{nombre}" required>
+        <p class="error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></p>
+        <label for="descripcion">Descripción</label>
+        <input type="text" th:field="*{descripcion}">
+        <p class="error" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></p>
+        <button class="boton" type="submit">Guardar</button>
+        <a class="boton secundaria" th:href="@{/categorias}">Volver</a>
+    </form>
+</main>
+</body>
+</html>

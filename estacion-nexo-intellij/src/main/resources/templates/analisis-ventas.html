@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="graficos(analisis)" class="paneles-perfil">
+    <section class="panel-grafico" data-grafico="columnas">
+        <h2>Importe promedio por venta</h2>
+        <p th:if="${analisis.maximoTicket.signum() == 0}">No hay ventas para calcular el promedio.</p>
+        <div class="ticket-visor" th:if="${analisis.maximoTicket.signum() > 0}" tabindex="0" aria-label="Importe promedio en soles por fecha">
+            <div class="ticket-eje" th:text="|S/ ${#numbers.formatDecimal(analisis.maximoTicket,1,2)}|"></div>
+            <ol class="ticket-columnas">
+                <li th:each="dia : ${analisis.tickets}" tabindex="0" th:title="${dia.fecha}"
+                    th:aria-label="|${dia.fecha}: ${dia.importe == null ? 'sin ventas' : 'S/ ' + dia.importe}|">
+                    <div class="ticket-altura"><span th:style="|--altura:${dia.altura}%|"></span></div>
+                    <small th:text="${dia.fecha.substring(5)}"></small>
+                    <strong th:text="${dia.importe == null ? '—' : #numbers.formatDecimal(dia.importe,1,2)}"></strong>
+                </li>
+            </ol>
+        </div>
+    </section>
+    <section class="panel-grafico" data-grafico="dispersion">
+        <h2>Litros e importe por jornada</h2>
+        <p th:if="${analisis.puntos.isEmpty()}">No hay jornadas con ventas en el periodo.</p>
+        <svg th:unless="${analisis.puntos.isEmpty()}" viewBox="0 0 410 218" class="grafico-dispersion"
+             xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Dispersión de litros en horizontal e importe en vertical">
+            <path d="M54 28 V178 H373 M54 34 H367 M54 106 H367" class="dispersion-ejes"/>
+            <text x="4" y="17" class="grafico-eje">S/</text>
+            <text x="49" y="38" class="grafico-eje" text-anchor="end" th:text="${analisis.maximoVentas.stripTrailingZeros().toPlainString()}"></text>
+            <text x="49" y="181" class="grafico-eje" text-anchor="end">0</text>
+            <text x="54" y="195" class="grafico-eje">0</text>
+            <text x="372" y="195" class="grafico-eje" text-anchor="end" th:text="|${analisis.maximoLitros.stripTrailingZeros().toPlainString()} L|"></text>
+            <g class="grafico-marca" th:each="p : ${analisis.puntos}" tabindex="0" role="img" th:aria-label="${p.detalle}">
+                <title th:text="${p.detalle}"></title>
+                <circle class="grafico-punto" r="5" th:attr="cx=${p.x},cy=${p.y}"/>
+                <text x="54" y="212" class="grafico-valor" th:text="${p.detalle}"></text>
+            </g>
+        </svg>
+    </section>
+    <section class="panel-grafico" data-grafico="barras-semana">
+        <h2>Litros promedio por día de la semana</h2>
+        <ul class="barras-combustible">
+            <li th:each="dia : ${analisis.semana}">
+                <div class="barra-cabecera">
+                    <span th:text="${dia.dia}"></span>
+                    <strong th:text="${dia.litros == null ? 'Sin fechas' : #numbers.formatDecimal(dia.litros,1,3) + ' L'}"></strong>
+                </div>
+                <div class="barra-pista" aria-hidden="true"><div class="barra-litros" th:style="|--avance:${dia.ancho}%|"></div></div>
+            </li>
+        </ul>
+    </section>
+</div>
+</body>
+</html>

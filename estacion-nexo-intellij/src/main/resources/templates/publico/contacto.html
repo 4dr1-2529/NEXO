@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Contacto')}"></head>
+<body>
+<header th:replace="~{publico/base :: barra}"></header>
+<main class="contacto" th:with="canales=${!direccion.isBlank() || !telefono.isBlank() || !correo.isBlank() || !horario.isBlank()}">
+    <div class="contacto-titulo">
+        <h1>Contacto de la estación</h1>
+        <p th:if="${canales}">Consulta la ubicación y los canales de atención disponibles.</p>
+    </div>
+    <dl class="contacto-canales" th:if="${canales}">
+        <div th:unless="${direccion.isBlank()}"><dt>Dirección</dt><dd th:text="${direccion}"></dd></div>
+        <div th:unless="${telefono.isBlank()}"><dt>Teléfono</dt><dd th:text="${telefono}"></dd></div>
+        <div th:unless="${correo.isBlank()}"><dt>Correo</dt><dd th:text="${correo}"></dd></div>
+        <div th:unless="${horario.isBlank()}"><dt>Horario</dt><dd th:text="${horario}"></dd></div>
+    </dl>
+    <section class="contacto-aviso" th:unless="${canales}">
+        <h2>Canales de atención</h2>
+        <p>La estación aún tiene pendiente publicar su dirección, teléfono y correo electrónico.</p>
+    </section>
+
+    <nav class="contacto-acciones" aria-label="Opciones de contacto">
+        <a class="boton secundaria" th:href="@{/}">Volver al inicio</a>
+        <a class="boton" th:href="@{/login}">Acceso del personal</a>
+    </nav>
+</main>
+</body>
+</html>

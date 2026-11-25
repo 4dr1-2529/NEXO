@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Solicitud ya enviada')}"></head>
+<body>
+<main class="panel">
+    <h1>Solicitud ya enviada</h1>
+    <p role="alert">Este formulario ya se recibió. Consulta el resultado antes de intentarlo de nuevo.</p>
+    <a class="boton secundaria" th:href="@{/dashboard}">Volver al resumen</a>
+</main>
+</body>
+</html>

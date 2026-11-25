@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Proveedores')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen">
+    <h1>Proveedores</h1>
+    <p role="status" th:if="${mensaje}" th:text="${mensaje}"></p>
+    <p class="error" role="alert" th:if="${error}" th:text="${error}"></p>
+    <a class="boton" th:if="${admin}" th:href="@{/proveedores/nuevo}">Nuevo proveedor</a>
+    <p th:if="${registros.isEmpty()}">No se encontraron registros.</p>
+    <div class="tabla" th:unless="${registros.isEmpty()}">
+        <table>
+            <thead><tr><th>RUC</th><th>Razón social</th><th>Contacto</th><th>Teléfono</th><th>Correo</th><th>Dirección</th><th>Estado</th><th th:if="${admin}">Acciones</th></tr></thead>
+            <tbody><tr th:each="registro : ${registros}">
+                <td th:text="${registro.datos.ruc}"></td>
+                <td th:text="${registro.datos.razonSocial}"></td>
+                <td th:text="${registro.datos.contacto}"></td>
+                <td th:text="${registro.datos.telefono}"></td>
+                <td th:text="${registro.datos.correo}"></td>
+                <td th:text="${registro.datos.direccion}"></td>
+                
+                <td th:text="${registro.activo ? 'Activo' : 'Inactivo'}"></td>
+                <td th:if="${admin}">
+                    <a th:href="@{/proveedores/{id}/editar(id=${registro.id})}">Editar</a>
+                    <form method="post" th:action="@{/proveedores/{id}/estado(id=${registro.id})}">
+        <input type="hidden" name="_envio" th:value="${envio}">
+                        <button th:unless="${registro.activo}" class="boton secundaria" type="submit" name="activo" value="true">Activar</button>
+                        <details th:if="${registro.activo}" class="confirmacion">
+                            <summary class="boton secundaria">Desactivar…</summary>
+                            <p>¿Confirmas que deseas desactivar este registro? Puedes cerrar este aviso para cancelar.</p>
+                            <button class="boton peligro" type="submit" name="activo" value="false">Confirmar desactivación</button>
+                        </details>
+                    </form>
+                </td>
+                
+            </tr></tbody>
+        </table>
+    </div>
+    <nav aria-label="Paginación">
+        <a th:if="${pagina > 0}" th:href="@{/proveedores(pagina=${pagina - 1},categoria=${categoria})}">Anterior</a>
+        <a th:if="${registros.size() == 25}" th:href="@{/proveedores(pagina=${pagina + 1},categoria=${categoria})}">Siguiente</a>
+    </nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera(${compra ? 'Nueva compra' : 'Nueva venta'})}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen">
+    <h1 th:text="${compra ? 'Nueva compra' : 'Nueva venta'}"></h1>
+    <p class="error" role="alert" th:if="${error}" th:text="${error}"></p>
+    <form method="post" th:action="${compra} ? @{/compras/nueva} : @{/ventas/nueva}">
+        <input type="hidden" name="_envio" th:value="${envio}">
+        <input type="hidden" name="solicitud" th:value="${solicitud}">
+        <th:block th:if="${compra}">
+            <label for="proveedor">Proveedor</label>
+            <select id="proveedor" name="proveedor" required>
+                <option value="">Selecciona un proveedor</option>
+                <option th:each="p : ${proveedores}" th:value="${p.id}" th:text="${p.datos.razonSocial}"
+                        th:selected="${p.id == proveedor}"></option>
+            </select>
+            <label for="observacion">Observación</label>
+            <input id="observacion" name="observacion" maxlength="200" th:value="${observacion}">
+        </th:block>
+        <fieldset th:each="linea, fila : ${lineas}">
+            <legend th:text="|Combustible ${fila.count}|"></legend>
+            <label th:for="|producto${fila.index}|">Combustible</label>
+            <select th:id="|producto${fila.index}|" th:name="|producto${fila.index}|" required>
+                <option value="">Selecciona un combustible</option>
+                <option th:each="p : ${productos}" th:value="${p.id}"
+                        th:text="|${p.datos.nombre} · ${#numbers.formatDecimal(p.existencias,1,3)} ${p.datos.unidadMedida}|"
+                        th:selected="${#strings.toString(p.id) == linea.producto}"></option>
+            </select>
+            <label th:for="|litros${fila.index}|">Cantidad (unidad del combustible)</label>
+            <input type="number" th:id="|litros${fila.index}|" th:name="|litros${fila.index}|"
+                   step="0.001" min="0.001" required th:value="${linea.litros}">
+            <th:block th:if="${compra}">
+                <label th:for="|precio${fila.index}|">Precio de compra por unidad</label>
+                <input type="number" th:id="|precio${fila.index}|" th:name="|precio${fila.index}|"
+                       step="0.01" min="0.01" required th:value="${linea.precio}">
+            </th:block>
+        </fieldset>
+        <button th:if="${lineas.size() < 50}" type="submit" name="accion" value="agregar" formnovalidate>Agregar combustible</button>
+        <button class="boton" type="submit" name="accion" value="confirmar">Confirmar</button>
+        <a class="boton secundaria" th:href="${compra} ? @{/compras} : @{/ventas}">Volver al historial</a>
+    </form>
+</main>
+</body>
+</html>

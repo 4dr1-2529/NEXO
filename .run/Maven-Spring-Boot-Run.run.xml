@@ -1,0 +1,31 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Maven Spring Boot Run" type="MavenRunConfiguration" factoryName="Maven">
+    <MavenSettings>
+      <option name="myRunnerSettings">
+        <MavenRunnerSettings>
+          <option name="delegateBuildToMaven" value="false" />
+          <option name="jreName" value="#USE_PROJECT_JDK" />
+          <option name="environmentProperties">
+            <map>
+              <entry key="SPRING_PROFILES_ACTIVE" value="demostracion" />
+            </map>
+          </option>
+        </MavenRunnerSettings>
+      </option>
+      <option name="myRunnerParameters">
+        <MavenRunnerParameters>
+          <option name="workingDirPath" value="$PROJECT_DIR$" />
+          <option name="goals">
+            <list>
+              <option value="-pl" />
+              <option value="estacion-nexo-intellij" />
+              <option value="spring-boot:run" />
+            </list>
+          </option>
+          <option name="pomFileName" value="pom.xml" />
+        </MavenRunnerParameters>
+      </option>
+    </MavenSettings>
+    <method v="2" />
+  </configuration>
+</component>

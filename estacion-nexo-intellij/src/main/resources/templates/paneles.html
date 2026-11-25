@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="filtro(ruta, periodo)" class="panel-filtro">
+    <form class="filtros-dashboard" method="get" th:action="@{${ruta}}">
+        <label for="desde">Desde</label>
+        <input id="desde" name="desde" type="date" th:value="${periodo.desde}" required>
+        <label for="hasta">Hasta</label>
+        <input id="hasta" name="hasta" type="date" th:value="${periodo.hasta}" required>
+        <button class="boton" type="submit">Aplicar filtros</button>
+    </form>
+    <div class="periodo-atajos">
+        <a class="boton secundaria" th:href="@{${ruta}(desde=${periodo.hoy},hasta=${periodo.hoy})}">Hoy</a>
+        <a class="boton secundaria" th:href="@{${ruta}(desde=${periodo.hoy.minusDays(6)},hasta=${periodo.hoy})}">7 días</a>
+        <a class="boton secundaria" th:href="@{${ruta}(desde=${periodo.hoy.minusDays(9)},hasta=${periodo.hoy})}">10 días</a>
+        <a class="boton secundaria" th:href="@{${ruta}(desde=${periodo.hoy.minusDays(14)},hasta=${periodo.hoy})}">15 días</a>
+        <a class="boton secundaria" th:href="@{${ruta}(desde=${periodo.hoy.minusDays(29)},hasta=${periodo.hoy})}">30 días</a>
+    </div>
+    <p class="periodo-zona">Fechas en hora de Lima.</p>
+</div>
+<div th:fragment="grafico(titulo,serie,columnas)" class="grafico-visor" tabindex="0"
+     th:aria-label="|Gráfico de ${titulo}, desplaza para ver todas las fechas|">
+    <p class="panel-vacio" th:if="${serie == null}">Sin datos gráficos para este periodo.</p>
+    <svg th:if="${serie != null}" class="grafico-svg" xmlns="http://www.w3.org/2000/svg" role="group"
+         th:attr="viewBox=|0 0 ${serie.ancho} 232|" th:style="|--grafico-ancho:${serie.ancho}px|"
+         th:aria-label="|Gráfico de ${titulo}, en soles|">
+        <defs th:if="${columnas}">
+            <pattern id="egresos-trama" width="6" height="6" patternUnits="userSpaceOnUse">
+                <rect width="6" height="6" class="trama-fondo"></rect>
+                <path d="M0 6 6 0" class="trama-linea"></path>
+            </pattern>
+        </defs>
+        <text x="16" y="16" class="grafico-eje">S/</text>
+        <g th:each="e : ${serie.ejeY}">
+            <line x1="78" th:attr="x2=${serie.ancho - 24},y1=${e.posicion},y2=${e.posicion}" class="grafico-guia"></line>
+            <text x="72" th:attr="y=${e.posicion + 4}" text-anchor="end" class="grafico-eje" th:text="${e.etiqueta}"></text>
+        </g>
+        <text th:each="e : ${serie.ejeX}" th:attr="x=${e.posicion}" y="216" text-anchor="middle"
+              class="grafico-eje" th:text="${e.etiqueta}"></text>
+        <polyline th:unless="${columnas}" class="grafico-linea" th:attr="points=${serie.trazo}"></polyline>
+        <g th:each="p : ${serie.marcas}" class="grafico-marca" tabindex="0" role="img" th:aria-label="${p.etiqueta}">
+            <title th:text="${p.etiqueta}"></title>
+            <circle th:unless="${columnas}" class="grafico-punto" r="4" th:attr="cx=${p.x},cy=${p.y}"></circle>
+            <rect th:if="${columnas}" th:class="${p.secundaria ? 'grafico-columna egreso' : 'grafico-columna ingreso'}"
+                  th:attr="x=${p.x},y=${p.y},width=${p.ancho},height=${p.alto == 0 ? 1 : p.alto}"></rect>
+            <text th:attr="x=${p.x},y=${p.y - 8}" class="grafico-valor" text-anchor="middle" th:text="${p.valor}"></text>
+        </g>
+    </svg>
+</div>
+<ul th:fragment="barras(filas)" class="barras-combustible">
+    <li th:each="fila : ${filas}">
+        <div class="barra-cabecera">
+            <span th:text="${fila.dato.nombre}"></span>
+            <span class="stock-bajo" th:if="${fila.dato.bajo()}">Stock bajo</span>
+            <strong th:text="|${#numbers.formatDecimal(fila.dato.cantidad,1,3)} ${fila.dato.unidad}|"></strong>
+        </div>
+        <div class="barra-pista" aria-hidden="true"><div class="barra-litros" th:style="|--avance:${fila.avance}%|"></div></div>
+    </li>
+</ul>
+<div th:fragment="stock(filas)" class="tabla">
+    <table>
+        <thead><tr><th>Código</th><th>Combustible</th><th>Unidad</th><th>Stock actual</th><th>Mínimo</th><th>Alerta</th></tr></thead>
+        <tbody><tr th:each="fila : ${filas}">
+            <td th:text="${fila.dato.codigo}"></td><th scope="row" th:text="${fila.dato.nombre}"></th>
+            <td th:text="${fila.dato.unidad}"></td>
+            <td th:text="${#numbers.formatDecimal(fila.dato.cantidad,1,3)}"></td>
+            <td th:text="${fila.dato.minimo == null ? 'Sin mínimo' : #numbers.formatDecimal(fila.dato.minimo,1,3)}"></td>
+            <td th:text="${fila.dato.bajo() ? 'Stock bajo' : '—'}"></td>
+        </tr></tbody>
+    </table>
+</div>
+<section th:fragment="caja(resumen)" aria-label="Panel de caja">
+    <h2>Balance de caja</h2>
+    <dl class="indicadores">
+        <div><dt>Ingresos del periodo</dt><dd th:text="|S/ ${#numbers.formatDecimal(resumen.totalIngresos,1,2)}|"></dd></div>
+        <div><dt>Egresos del periodo</dt><dd th:text="|S/ ${#numbers.formatDecimal(resumen.totalEgresos,1,2)}|"></dd></div>
+    </dl>
+    <dl class="indicadores indicadores-actuales" th:if="${resumen.saldoActual != null}">
+        <div><dt>Saldo actual · Caja abierta</dt><dd th:text="|S/ ${#numbers.formatDecimal(resumen.saldoActual,1,2)}|"></dd></div>
+    </dl>
+    <p class="panel-vacio" th:unless="${resumen.hayCajas}">No hay movimientos ni cajas registradas en el periodo.</p>
+    <section class="panel-grafico">
+        <h3>Ingresos y egresos por fecha</h3>
+        <ul class="grafico-leyenda"><li class="ingreso">Ingresos (S/)</li><li class="egreso">Egresos (S/)</li></ul>
+        <div th:replace="~{paneles :: grafico('Ingresos y egresos',${resumen.flujosCaja},true)}"></div>
+        <details class="panel-detalle">
+            <summary>Detalle de flujos y cierres de caja</summary>
+            <div class="tabla">
+                <table>
+                    <thead><tr><th>Fecha</th><th>Ingresos (S/)</th><th>Egresos (S/)</th><th>Saldo de cierre (S/)</th><th>Estado</th></tr></thead>
+                    <tbody><tr th:each="dia : ${resumen.dias}">
+                        <th scope="row" th:text="${dia.fecha}"></th>
+                        <td th:text="${#numbers.formatDecimal(dia.ingresos,1,2)}"></td>
+                        <td th:text="${#numbers.formatDecimal(dia.egresos,1,2)}"></td>
+                        <td th:text="${dia.saldoCierre == null ? '—' : #numbers.formatDecimal(dia.saldoCierre,1,2)}"></td>
+                        <td th:text="${dia.cajaAbierta ? 'Abierta' : (dia.tieneCaja ? 'Cerrada' : 'Sin caja')}"></td>
+                    </tr></tbody>
+                </table>
+            </div>
+        </details>
+    </section>
+    <section class="panel-grafico">
+        <h3>Saldo de cierre por jornada</h3>
+        <p th:if="${resumen.cierresCaja == null or resumen.cierresCaja.marcas.isEmpty()}">Sin jornadas cerradas en el periodo.</p>
+        <div th:if="${resumen.cierresCaja != null and !resumen.cierresCaja.marcas.isEmpty()}">
+            <div th:replace="~{paneles :: grafico('Saldo de cierre',${resumen.cierresCaja},false)}"></div>
+        </div>
+    </section>
+</section>
+</body>
+</html>

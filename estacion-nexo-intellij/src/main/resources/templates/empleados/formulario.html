@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Empleados')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen">
+    <h1 th:text="${id == null ? 'Registrar empleado' : 'Editar empleado'}"></h1>
+    <p class="error" role="alert" th:if="${error}" th:text="${error}"></p>
+    <form method="post" th:action="${id == null} ? @{/empleados} : @{/empleados/{id}/editar(id=${id})}" th:object="${datos}">
+        <input type="hidden" name="_envio" th:value="${envio}">
+        <label for="dni">DNI</label>
+        <input type="text" th:field="*{dni}" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" title="8 dígitos" required>
+        <p class="error" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></p>
+        <label for="nombres">Nombres</label>
+        <input type="text" th:field="*{nombres}" required>
+        <p class="error" th:if="${#fields.hasErrors('nombres')}" th:errors="*{nombres}"></p>
+        <label for="apellidos">Apellidos</label>
+        <input type="text" th:field="*{apellidos}" required>
+        <p class="error" th:if="${#fields.hasErrors('apellidos')}" th:errors="*{apellidos}"></p>
+        <label for="cargo">Cargo</label>
+        <input type="text" th:field="*{cargo}" required>
+        <p class="error" th:if="${#fields.hasErrors('cargo')}" th:errors="*{cargo}"></p>
+        <label for="telefono">Teléfono</label>
+        <input type="tel" th:field="*{telefono}" inputmode="numeric" pattern="[0-9]{9}" maxlength="9" title="9 dígitos" required>
+        <p class="error" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></p>
+        <label for="fechaIngreso">Fecha de ingreso</label>
+        <input type="date" th:field="*{fechaIngreso}">
+        <p class="error" th:if="${#fields.hasErrors('fechaIngreso')}" th:errors="*{fechaIngreso}"></p>
+        <button class="boton" type="submit">Guardar</button>
+        <a class="boton secundaria" th:href="@{/empleados}">Volver</a>
+    </form>
+</main>
+</body>
+</html>

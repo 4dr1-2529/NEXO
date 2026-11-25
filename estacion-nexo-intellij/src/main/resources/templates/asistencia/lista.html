@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Asistencia')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen">
+    <h1 th:text="${personal ? 'Control de asistencia' : 'Mi asistencia'}"></h1>
+    <p role="alert" class="error" th:if="${error}" th:text="${error}"></p>
+    <p role="status" th:if="${mensaje}" th:text="${mensaje}"></p>
+    <form th:unless="${personal}" method="post" th:action="@{/asistencia/propia}">
+        <input type="hidden" name="_envio" th:value="${envio}">
+        <button class="boton" type="submit" name="marca" value="ENTRADA">Marcar entrada</button>
+        <button class="boton" type="submit" name="marca" value="SALIDA">Marcar salida</button>
+    </form>
+    <form class="filtros-asistencia" method="get" th:action="@{${ruta}}">
+        <label for="desde">Desde</label><input id="desde" type="date" name="desde" th:value="${desde}">
+        <label for="hasta">Hasta</label><input id="hasta" type="date" name="hasta" th:value="${hasta}">
+        <th:block th:if="${personal}">
+            <label for="empleado">ID del empleado</label>
+            <input id="empleado" type="number" name="empleado" min="1" th:value="${empleado}">
+        </th:block>
+        <button class="boton" type="submit">Aplicar filtros</button>
+    </form>
+    <div class="periodo-atajos">
+        <a class="boton secundaria" th:href="@{${ruta}(desde=${hoy},hasta=${hoy},empleado=${empleado})}">Hoy</a>
+        <a class="boton secundaria" th:href="@{${ruta}(empleado=${empleado})}">Últimos 10 días completos</a>
+    </div>
+    <p class="periodo-zona">Fechas en hora de Lima.</p>
+    <p th:if="${jornadas.isEmpty()}">No se encontraron marcaciones.</p>
+    <dl class="indicadores">
+        <div><dt>Jornadas presentes</dt><dd th:text="${resumen.presentes}"></dd></div>
+        <div><dt>Jornadas completas</dt><dd th:text="${resumen.completas}"></dd></div>
+        <div><dt>Tiempo registrado</dt><dd th:text="|${resumen.horas()} h ${resumen.minutos()} min|"></dd></div>
+    </dl>
+    <div class="tabla" th:unless="${jornadas.isEmpty()}">
+        <table>
+            <thead><tr><th>Empleado</th><th>Fecha</th><th>Entrada</th><th>Salida</th><th>Estado</th></tr></thead>
+            <tbody><tr th:each="j : ${jornadas}">
+                <td th:text="${j.nombre}"></td><td th:text="${j.fecha}"></td>
+                <td th:text="${j.entrada}"></td><td th:text="${j.salida ?: 'Pendiente'}"></td><td th:text="${j.estado}"></td>
+            </tr></tbody>
+        </table>
+    </div>
+    <nav aria-label="Paginación">
+        <a th:if="${pagina > 0}" th:href="@{${ruta}(pagina=${pagina - 1},desde=${desde},hasta=${hasta},empleado=${empleado})}">Anterior</a>
+        <a th:if="${jornadas.size() == 25}" th:href="@{${ruta}(pagina=${pagina + 1},desde=${desde},hasta=${hasta},empleado=${empleado})}">Siguiente</a>
+    </nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Detalle')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen">
+    <h1 th:text="|Detalle ${resultado.registro.codigo}|"></h1>
+    <dl>
+        <dt>Fecha</dt><dd th:text="${resultado.registro.fecha}"></dd>
+        <dt>Responsable</dt><dd th:text="${resultado.registro.responsable}"></dd>
+        <dt>Referencia</dt><dd th:text="${resultado.registro.referencia ?: '—'}"></dd>
+        <dt>Estado o tipo</dt><dd th:text="${resultado.registro.estado}"></dd>
+        <dt>Importe</dt><dd th:text="|S/ ${resultado.registro.valor}|"></dd>
+    </dl>
+    <div class="tabla" th:unless="${resultado.lineas.isEmpty()}">
+        <table>
+            <thead><tr><th>Combustible</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th></tr></thead>
+            <tbody><tr th:each="linea : ${resultado.lineas}">
+                <td th:text="${linea.producto}"></td><td th:text="${linea.litros}"></td>
+                <td th:text="${linea.precio}"></td><td th:text="${linea.subtotal}"></td>
+            </tr></tbody>
+        </table>
+    </div>
+    <a class="boton" th:href="@{${ruta}}">Volver</a>
+</main>
+</body>
+</html>

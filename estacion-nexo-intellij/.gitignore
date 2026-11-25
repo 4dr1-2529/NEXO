@@ -1,0 +1,8 @@
+/target/
+/out/
+*.iml
+/config/nexo-local.properties
+*.log
+tmp/
+temp/
+*.tmp

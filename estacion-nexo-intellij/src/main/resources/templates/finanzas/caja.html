@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Caja diaria')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen">
+    <h1>Caja diaria</h1>
+    <p role="alert" class="error" th:if="${error}" th:text="${error}"></p>
+    <p role="status" th:if="${mensaje}" th:text="${mensaje}"></p>
+    <div th:replace="~{paneles :: filtro('/finanzas',${resumen.periodo})}"></div>
+    <section th:replace="~{paneles :: caja(${resumen})}"></section>
+    <nav>
+        <a th:href="@{/finanzas/movimientos}">Ingresos y egresos</a>
+        <a th:href="@{/finanzas/movimientos(tipo='INGRESO')}">Ingresos</a>
+        <a th:href="@{/finanzas/movimientos(tipo='EGRESO')}">Egresos</a>
+        <a th:href="@{/finanzas/movimiento-manual}">Movimiento manual</a>
+        <a th:href="@{/finanzas/conceptos}">Conceptos económicos</a>
+    </nav>
+    <p th:if="${cajaActual != null}" th:text="${cajaActual.abierta ? 'Caja abierta' : 'Caja cerrada'}"></p>
+    <form th:if="${cajaActual == null}" method="post" th:action="@{/finanzas/abrir}">
+        <input type="hidden" name="_envio" th:value="${envio}">
+        <label for="apertura">Saldo de apertura (S/)</label>
+        <input type="number" step=".01" min="0" id="apertura" name="apertura" required>
+        <button class="boton" type="submit">Abrir caja</button>
+    </form>
+    <form th:if="${cajaActual != null && cajaActual.abierta}" method="post" th:action="@{/finanzas/cerrar}">
+        <input type="hidden" name="_envio" th:value="${envio}">
+        <details class="confirmacion">
+            <summary class="boton secundaria">Cerrar caja…</summary>
+            <p>¿Confirmas el cierre de la caja del día? Puedes cerrar este aviso para cancelar.</p>
+            <button class="boton peligro" type="submit">Confirmar cierre</button>
+        </details>
+    </form>
+</main>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Ajuste de inventario')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen">
+    <h1 th:text="${entrada ? 'Entrada de combustible' : 'Salida de combustible'}"></h1>
+    <p role="alert" class="error" th:if="${error}" th:text="${error}"></p>
+    <p role="status" th:if="${mensaje}" th:text="${mensaje}"></p>
+    <a th:href="@{/inventario/existencias}">Consultar identificadores y existencias</a>
+    <form method="post" th:action="${entrada} ? @{/inventario/entrada} : @{/inventario/salida}">
+        <input type="hidden" name="_envio" th:value="${envio}">
+        <input type="hidden" name="solicitud" th:value="${solicitud}">
+        <label for="producto">ID del combustible</label><input type="number" min="1" id="producto" name="producto" required>
+        <label for="litros">Cantidad (unidad del combustible: L, gal o m3)</label>
+        <input type="number" min=".001" step=".001" id="litros" name="litros" required>
+        <label for="motivo">Motivo</label><input id="motivo" name="motivo" maxlength="200" required>
+        <button class="boton" type="submit">Registrar ajuste</button>
+    </form>
+</main>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{publico/base :: cabecera('Reportes')}"></head>
+<body>
+<header th:replace="~{navegacion :: menu}"></header>
+<main class="resumen paneles reportes-imprimibles">
+    <h1>Reportes consolidados</h1>
+    <p class="resumen-rol" th:text="|Periodo en hora de Lima · ${rol}|"></p>
+    <p class="hint-impresion">Para imprimir use Ctrl+P o la opción Imprimir del navegador.</p>
+    <p class="error" role="alert" th:if="${error}" th:text="${error}"></p>
+    <div th:replace="~{paneles :: filtro('/reportes',${resumen.periodo})}"></div>
+
+    <section th:if="${resumen.ventas}" aria-label="Ventas diarias">
+        <h2>Ventas diarias</h2>
+        <dl class="indicadores">
+            <div><dt>Total vendido</dt><dd th:text="|S/ ${#numbers.formatDecimal(resumen.totalVentas,1,2)}|"></dd></div>
+            <div><dt>Ventas confirmadas</dt><dd th:text="${resumen.cantidadVentas}"></dd></div>
+            <div><dt>Litros (solo L)</dt><dd th:text="|${#numbers.formatDecimal(resumen.totalLitros,1,3)} L|"></dd></div>
+        </dl>
+        <p class="panel-vacio" th:if="${resumen.cantidadVentas == 0}">No hay ventas confirmadas en el periodo.</p>
+        <div th:if="${resumen.lineaVentas != null}"
+             th:replace="~{paneles :: grafico('Ventas diarias',${resumen.lineaVentas},false)}"></div>
+        <div class="tabla">
+            <table>
+                <thead><tr><th>Fecha</th><th>Ventas</th><th>Importe (S/)</th><th>Litros (L)</th></tr></thead>
+                <tbody><tr th:each="dia : ${resumen.dias}">
+                    <th scope="row" th:text="${dia.fecha}"></th>
+                    <td th:text="${dia.cantidadVentas}"></td>
+                    <td th:text="${#numbers.formatDecimal(dia.ventas,1,2)}"></td>
+                    <td th:text="${#numbers.formatDecimal(dia.litros,1,3)}"></td>
+                </tr></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section th:if="${resumen.ventas}" aria-label="Ventas por combustible">
+        <h2>Ventas por combustible</h2>
+        <p class="panel-vacio" th:if="${resumen.combustiblesVendidos.isEmpty()}">Sin volumen vendido en el periodo.</p>
+        <div th:unless="${resumen.combustiblesVendidos.isEmpty()}"
+             th:replace="~{paneles :: barras(${resumen.combustiblesVendidos})}"></div>
+        <div class="tabla" th:unless="${resumen.combustiblesVendidos.isEmpty()}">
+            <table>
+                <thead><tr><th>Código</th><th>Producto</th><th>Unidad</th><th>Cantidad</th></tr></thead>
+                <tbody><tr th:each="fila : ${resumen.combustiblesVendidos}">
+                    <td th:text="${fila.dato.codigo}"></td>
+                    <th scope="row" th:text="${fila.dato.nombre}"></th>
+                    <td th:text="${fila.dato.unidad}"></td>
+                    <td th:text="${#numbers.formatDecimal(fila.dato.cantidad,1,3)}"></td>
+                </tr></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section th:if="${resumen.ventas}" aria-label="Productos más vendidos">
+        <h2>Productos más vendidos</h2>
+        <ol class="ranking-productos" th:unless="${resumen.combustiblesVendidos.isEmpty()}">
+            <li th:each="fila,stat : ${resumen.combustiblesVendidos}"
+                th:text="|${stat.count}. ${fila.dato.nombre} · ${#numbers.formatDecimal(fila.dato.cantidad,1,3)} ${fila.dato.unidad}|"></li>
+        </ol>
+        <p class="panel-vacio" th:if="${resumen.combustiblesVendidos.isEmpty()}">Sin ventas en el periodo.</p>
+    </section>
+
+    <section th:if="${resumen.finanzas}" aria-label="Compras por proveedor">
+        <h2>Compras por proveedor</h2>
+        <div class="tabla">
+            <table>
+                <thead><tr><th>RUC</th><th>Proveedor</th><th>Compras</th><th>Total (S/)</th></tr></thead>
+                <tbody>
+                <tr th:each="fila : ${resumen.comprasProveedor}">
+                    <td th:text="${fila.ruc}"></td>
+                    <th scope="row" th:text="${fila.razonSocial}"></th>
+                    <td th:text="${fila.compras}"></td>
+                    <td th:text="${#numbers.formatDecimal(fila.total,1,2)}"></td>
+                </tr>
+                <tr th:if="${resumen.comprasProveedor.isEmpty()}">
+                    <td colspan="4">Sin compras confirmadas en el periodo.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section aria-label="Inventario y stock mínimo">
+        <h2>Inventario y stock mínimo</h2>
+        <dl class="indicadores">
+            <div><dt>Stock en litros (solo L)</dt><dd th:text="|${#numbers.formatDecimal(resumen.inventario.litros,1,3)} L|"></dd></div>
+            <div><dt>Bajo el mínimo</dt><dd th:text="${resumen.inventario.bajoMinimo()}"></dd></div>
+            <div><dt>Agotados</dt><dd th:text="${resumen.inventario.agotados()}"></dd></div>
+        </dl>
+        <div th:replace="~{paneles :: stock(${resumen.inventario.productos})}"></div>
+    </section>
+
+    <section th:if="${resumen.finanzas}" aria-label="Movimientos de inventario">
+        <h2>Movimientos de inventario</h2>
+        <p th:text="|Movimientos registrados en el periodo: ${resumen.movimientosInventario}|"></p>
+        <a class="boton secundaria no-imprimir"
+           th:href="@{/inventario/movimientos(desde=${resumen.periodo.desde},hasta=${resumen.periodo.hasta})}">Ver detalle</a>
+    </section>
+
+    <th:block th:if="${resumen.finanzas}">
+        <section th:replace="~{paneles :: caja(${resumen})}"></section>
+    </th:block>
+
+    <section th:if="${resumen.ventas}" aria-label="Evolución de ventas">
+        <h2>Evolución de ventas</h2>
+        <div th:replace="~{analisis-ventas :: graficos(${resumen.analisisVentas()})}"></div>
+    </section>
+
+    <section th:if="${resumen.comparacion != null}" aria-label="Comparación de periodos">
+        <h2>Comparación con el periodo anterior</h2>
+        <p th:text="|Anterior: ${resumen.comparacion.anterior.desde} — ${resumen.comparacion.anterior.hasta}|"></p>
+        <dl class="indicadores">
+            <div><dt>Ventas actuales</dt><dd th:text="|S/ ${#numbers.formatDecimal(resumen.totalVentas,1,2)}|"></dd></div>
+            <div><dt>Ventas anteriores</dt><dd th:text="|S/ ${#numbers.formatDecimal(resumen.comparacion.ventasAnterior,1,2)}|"></dd></div>
+            <div><dt>Ingresos actuales</dt><dd th:text="|S/ ${#numbers.formatDecimal(resumen.totalIngresos,1,2)}|"></dd></div>
+            <div><dt>Ingresos anteriores</dt><dd th:text="|S/ ${#numbers.formatDecimal(resumen.comparacion.ingresosAnterior,1,2)}|"></dd></div>
+            <div><dt>Egresos actuales</dt><dd th:text="|S/ ${#numbers.formatDecimal(resumen.totalEgresos,1,2)}|"></dd></div>
+            <div><dt>Egresos anteriores</dt><dd th:text="|S/ ${#numbers.formatDecimal(resumen.comparacion.egresosAnterior,1,2)}|"></dd></div>
+        </dl>
+    </section>
+</main>
+</body>
+</html>
