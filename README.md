@@ -15,7 +15,7 @@ Java · Maven · Spring Boot · Spring JDBC · Spring Security · Thymeleaf · F
 
 ## Arranque rápido
 
-1. En XAMPP: **Start** junto a MySQL (puerto 3306; `root` sin contraseña en la instalación típica).
+1. En XAMPP: **Start** junto a MySQL (puerto **3307**; `root` sin contraseña en la instalación típica). Configure `my.ini` con `port=3307` si aún usa 3306.
 2. Desde la raíz del proyecto:
 
 ```text
@@ -29,7 +29,7 @@ Cuentas de demostración: `admin`, `operador`, `vendedor` / `nexo2026`.
 
 En el primer arranque (perfil `demostracion`) se crea el esquema si falta, se aplican Flyway **V1–V7**, el catálogo, los usuarios y quince jornadas. Los reinicios no duplican datos.
 
-Con XAMPP por defecto **no** hace falta `nexo-local.properties`. Si personalizó puerto o clave, copie `estacion-nexo-intellij/config/nexo-local.properties.example` a `nexo-local.properties` (no se versiona).
+El puerto MySQL por defecto del proyecto es **3307**. Si necesita otra clave o usuario, cree `estacion-nexo-intellij/config/nexo-local.properties` (no se versiona).
 
 ## IntelliJ
 

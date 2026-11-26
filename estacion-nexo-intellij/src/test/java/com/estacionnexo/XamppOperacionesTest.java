@@ -34,7 +34,7 @@ class XamppOperacionesTest {
     @Test
     void migraConciliaConcurrenciaYConservaDatosAlReiniciar() throws Exception {
         String esquema = "estacion_nexo_test_" + UUID.randomUUID().toString().replace("-", "");
-        String puerto = variable("NEXO_TEST_PORT", "3306");
+        String puerto = variable("NEXO_TEST_PORT", "3307");
         if (!List.of("3306", "3307").contains(puerto)) {
             throw new IllegalArgumentException("Puerto de prueba de XAMPP inválido.");
         }

@@ -13,7 +13,7 @@ IntelliJ IDEA es opcional.
 ## Abrir el proyecto
 
 1. (Opcional) Abre la carpeta raíz `GASOLINERIA` en IntelliJ como proyecto Maven con el **Project SDK**.
-2. En XAMPP, **Start** junto a **MySQL** (puerto 3306, `root` sin contraseña en la instalación típica). Con esa configuración predeterminada **no** hace falta `nexo-local.properties`. Solo si personalizó XAMPP, copie `config/nexo-local.properties.example` a `config/nexo-local.properties` (no se versiona).
+2. En XAMPP, **Start** junto a **MySQL** (puerto **3307**, `root` sin contraseña en la instalación típica). Configure `my.ini` con `port=3307` si aún usa 3306. Si necesita otra clave o usuario, cree `config/nexo-local.properties` (no se versiona).
 3. Arranque: configuración **Estación NEXO**, **Maven Spring Boot Run**, o los comandos de abajo. Dirección oficial: **http://localhost:8080/login** (puerto 8080; `/` redirige a `/login`).
 4. Entra con `admin`, `operador` o `vendedor` y la contraseña `nexo2026` (perfil `demostracion`).
 
